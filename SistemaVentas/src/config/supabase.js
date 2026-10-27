@@ -1,17 +1,20 @@
-
 require('dotenv').config();
-
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://kmahrxgfqplzggsjkwwo.supabase.co';
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-    throw new Error(
-        'Faltan las variables de conexión de Supabase en .env'
+let supabase = null;
+
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+} else {
+  // Nota informativa para el desarrollador si aún no configura la REST API Key
+  if (process.env.NODE_ENV !== 'test') {
+    console.info(
+      '[Supabase SDK] No se definió SUPABASE_SECRET_KEY en .env. Se usará la conexión directa PostgreSQL (db.js).'
     );
+  }
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = supabase;

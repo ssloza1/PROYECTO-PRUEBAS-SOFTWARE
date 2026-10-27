@@ -1,0 +1,60 @@
+{
+  "name": "sistema-ventas-inventario",
+  "version": "1.0.0",
+  "description": "Sistema de Inventario y Ventas para la materia de Pruebas de Software con Supabase y PostgreSQL",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:unit": "jest tests/unit --runInBand",
+    "test:integration": "jest tests/integration --runInBand --detectOpenHandles",
+    "test:coverage": "jest --coverage --runInBand --detectOpenHandles",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "pruebas-de-software",
+    "software-testing",
+    "unit-testing",
+    "integration-testing",
+    "jest",
+    "supertest",
+    "inventario",
+    "ventas",
+    "supabase",
+    "postgresql"
+  ],
+  "author": "Equipo Pruebas de Software",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/database/",
+      "/public/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
+    ],
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "lcov",
+      "html"
+    ]
+  }
+}
