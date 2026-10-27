@@ -1,0 +1,16 @@
+{
+  "name": "proyecto-pruebas-software-root",
+  "version": "1.0.0",
+  "description": "Sistema de Inventario y Ventas - Pruebas de Software",
+  "scripts": {
+    "start": "npm --prefix SistemaVentas start",
+    "dev": "npm --prefix SistemaVentas run dev",
+    "test": "npm --prefix SistemaVentas test",
+    "test:unit": "npm --prefix SistemaVentas run test:unit",
+    "test:integration": "npm --prefix SistemaVentas run test:integration",
+    "test:coverage": "npm --prefix SistemaVentas run test:coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
