@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Inventario y Ventas - Pruebas de Software</title>
+  <meta name="description" content="Sistema de Inventario y Ventas conectado a Supabase PostgreSQL con Suite de Pruebas Unitarias y de Integración.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>Stock & Sales</h1>
+          <span>Pruebas de Software</span>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li>
+          <a class="nav-item active" data-tab="tab-dashboard" id="nav-dashboard">
+            <span class="icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-inventario" id="nav-inventario">
+            <span class="icon">📦</span>
+            <span>Inventario</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-pos" id="nav-pos">
+            <span class="icon">🛒</span>
+            <span>Punto de Venta</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-ventas" id="nav-ventas">
+            <span class="icon">🧾</span>
+            <span>Historial Ventas</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-clientes" id="nav-clientes">
+            <span class="icon">👥</span>
+            <span>Clientes</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-pruebas" id="nav-pruebas">
+            <span class="icon">🧪</span>
+            <span>Suite de Pruebas</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="db-status-badge">
+          <div class="pulse-dot"></div>
+          <div>
+            <strong>Supabase Cloud</strong>
+            <div style="font-size: 11px; opacity: 0.8;">PostgreSQL 17 Conectado</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- ================= TAB: DASHBOARD ================= -->
+      <section id="tab-dashboard" class="tab-section">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Panel de Control</h2>
+            <p>Métricas comerciales en tiempo real y estado del inventario</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="btn-refresh-dashboard">🔄 Actualizar</button>
+            <button class="btn btn-primary" id="btn-quick-sale">🛒 Nueva Venta</button>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Ingresos Totales</span>
+              <div class="metric-icon blue">💰</div>
+            </div>
+            <div class="metric-value" id="stat-total-ingresos">$0.00</div>
+            <div class="metric-sub" id="stat-total-ventas">0 ventas completadas</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Productos Activos</span>
+              <div class="metric-icon green">📦</div>
+            </div>
+            <div class="metric-value" id="stat-total-productos">0</div>
+            <div class="metric-sub" id="stat-valor-inventario">Valor est.: $0.00</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Stock Crítico / Bajo</span>
+              <div class="metric-icon amber">⚠️</div>
+            </div>
+            <div class="metric-value" id="stat-stock-bajo">0</div>
+            <div class="metric-sub" id="stat-productos-agotados">0 productos agotados</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Clientes Registrados</span>
+              <div class="metric-icon cyan">👥</div>
+            </div>
+            <div class="metric-value" id="stat-total-clientes">0</div>
+            <div class="metric-sub">Habilitados para facturación</div>
+          </div>
+        </div>
+
+        <!-- Recent Sales Card -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3 class="card-title">Últimas Transacciones</h3>
+            <span class="badge badge-neutral">Sincronizado con Supabase</span>
+          </div>
+          <div class="table-responsive">
+            <table class="custom-table" id="tabla-ultimas-ventas">
+              <thead>
+                <tr>
+                  <th># Venta</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-ultimas-ventas">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 30px;">Cargando transacciones...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: INVENTARIO ================= -->
+      <section id="tab-inventario" class="tab-section" style="display: none;">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Gestión de Inventario</h2>
+            <p>Control de existencias, umbrales de stock mínimo y precios</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="btn-modal-nuevo-producto">+ Nuevo Producto</button>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="content-card-header">
+            <div class="filters-bar">
+              <input type="text" id="filtro-buscar-producto" class="search-input" placeholder="Buscar por nombre o descripción...">
+              <select id="filtro-categoria" class="select-input">
+                <option value="">Todas las categorías</option>
+              </select>
+              <label style="font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-muted);">
+                <input type="checkbox" id="filtro-stock-bajo"> Solo stock bajo / crítico
+              </label>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-recargar-productos">Refrescar</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Proveedor</th>
+                  <th>Precio</th>
+                  <th>Stock Actual</th>
+                  <th>Stock Mín.</th>
+                  <th>Nivel</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-productos">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: PUNTO DE VENTA (POS) ================= -->
+      <section id="tab-pos" class="tab-section" style="display: none;">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Punto de Venta</h2>
+            <p>Registro atómico de órdenes y descuento inmediato de stock</p>
+          </div>
+        </div>
+
+        <div class="pos-layout">
+          <!-- Left: Selection Form -->
+          <div class="content-card">
+            <h3 class="card-title" style="margin-bottom: 18px;">Configuración de la Venta</h3>
+
+            <div class="form-group">
+              <label class="form-label" for="pos-cliente">Cliente Facturación *</label>
+              <select id="pos-cliente" class="form-input">
+                <option value="">Seleccione un cliente...</option>
+              </select>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); padding-top: 18px; margin-top: 18px;">
+              <h4 style="font-size: 15px; margin-bottom: 12px; font-weight: 600;">Agregar Productos a la Orden</h4>
+              
+              <div class="form-group">
+                <label class="form-label" for="pos-producto-select">Seleccionar Producto</label>
+                <select id="pos-producto-select" class="form-input">
+                  <option value="">Seleccione un producto disponible...</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="pos-cantidad">Cantidad a Vender</label>
+                  <input type="number" id="pos-cantidad" class="form-input" min="1" value="1">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                  <button class="btn btn-primary" id="btn-add-to-cart" style="width: 100%;">
+                    + Agregar al Carrito
+                  </button>
+                </div>
+              </div>
+
+              <div id="pos-stock-info" style="font-size: 12px; color: var(--accent); margin-top: -6px;"></div>
+            </div>
+          </div>
+
+          <!-- Right: Cart Summary & Checkout -->
+          <div class="cart-card">
+            <h3 class="card-title">Detalle del Carrito</h3>
+            
+            <div class="cart-items-list" id="cart-items-container">
+              <div style="text-align: center; color: var(--text-dim); padding: 40px 20px;">
+                El carrito está vacío. Agregue productos desde el panel izquierdo.
+              </div>
+            </div>
+
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="pos-subtotal">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Descuento (%)</span>
+                <input type="number" id="pos-descuento-pct" min="0" max="100" value="0" style="width: 65px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; padding: 2px 6px; border-radius: 4px; text-align: right;">
+              </div>
+              <div class="summary-row">
+                <span>IVA (15%)</span>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="pos-iva-check"> Aplicar IVA
+                </label>
+              </div>
+              <div class="summary-row total">
+                <span>Total a Pagar</span>
+                <span id="pos-total-general" style="color: #60a5fa;">$0.00</span>
+              </div>
+
+              <button class="btn btn-primary" id="btn-procesar-venta" style="width: 100%; margin-top: 18px; padding: 14px; font-size: 15px;">
+                💳 Confirmar y Registrar Venta
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: HISTORIAL VENTAS ================= -->
+      <section id="tab-ventas" class="tab-section" style="display: none;">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Historial de Ventas</h2>
+            <p>Registro histórico, consulta de recibos y anulación con reposición de inventario</p>
+          </div>
+          <div class="header-actions">
+            <select id="filtro-ventas-estado" class="select-input">
+              <option value="">Todos los estados</option>
+              <option value="COMPLETADA">Completadas</option>
+              <option value="ANULADA">Anuladas</option>
+            </select>
+            <button class="btn btn-secondary" id="btn-recargar-ventas">Refrescar</button>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th># Venta</th>
+                  <th>Cliente</th>
+                  <th>Cédula</th>
+                  <th>Fecha y Hora</th>
+                  <th>Total</th>
+                  <th>Ítems</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-ventas">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: CLIENTES ================= -->
+      <section id="tab-clientes" class="tab-section" style="display: none;">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Gestión de Clientes</h2>
+            <p>Directorio de clientes y validación de identificación ecuatoriana</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="btn-modal-nuevo-cliente">+ Nuevo Cliente</button>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Cédula</th>
+                  <th>Teléfono</th>
+                  <th>Correo</th>
+                  <th>Dirección</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-clientes">
+                <!-- Dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TAB: PRUEBAS DE SOFTWARE ================= -->
+      <section id="tab-pruebas" class="tab-section" style="display: none;">
+        <div class="header-bar">
+          <div class="page-title">
+            <h2>Suite de Pruebas de Software</h2>
+            <p>Especificación de casos de prueba, particiones de equivalencia y valores límite</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="btn-run-live-health">🩺 Ejecutar Verificación en Vivo</button>
+          </div>
+        </div>
+
+        <!-- Test Metrics Overview -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Total Casos de Prueba</span>
+              <div class="metric-icon blue">🧪</div>
+            </div>
+            <div class="metric-value">72</div>
+            <div class="metric-sub">Jest + Supertest Suite</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Pruebas Unitarias</span>
+              <div class="metric-icon green">⚡</div>
+            </div>
+            <div class="metric-value">62</div>
+            <div class="metric-sub">Cálculos, Validaciones, Servicios</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Pruebas de Integración</span>
+              <div class="metric-icon cyan">🔗</div>
+            </div>
+            <div class="metric-value">10</div>
+            <div class="metric-sub">API REST + Supabase DB</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Técnicas de Prueba</span>
+              <div class="metric-icon amber">📐</div>
+            </div>
+            <div class="metric-value">100%</div>
+            <div class="metric-sub">Valores Límite & Equivalencia</div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3 class="card-title" style="margin-bottom: 16px;">Técnicas de Pruebas Implementadas en el Proyecto</h3>
+          
+          <div class="test-suite-box">
+            <div class="test-suite-header">
+              <strong>1. Análisis de Valores Límite (Boundary Value Analysis - BVA)</strong>
+              <span class="test-tag">TÉCNICA DE CAJA NEGRA</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+              Se probaron las fronteras de stock (ej. stock disponible = 5; vender 5 es válido y deja stock en 0; vender 6 lanza error de stock insuficiente).
+              En cálculo de subtotales: cantidad = 0 lanza excepción; cantidad = 1 es el límite válido inferior; precio = 0 es admitido; precio negativo lanza error.
+            </p>
+          </div>
+
+          <div class="test-suite-box">
+            <div class="test-suite-header">
+              <strong>2. Partición de Equivalencia (Equivalence Partitioning - EP)</strong>
+              <span class="test-tag">TÉCNICA DE CAJA NEGRA</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+              Clases de equivalencia válidas e inválidas para estados de producto: <code>AGOTADO</code> (&le; 0), <code>CRITICO</code> (1 a stock_minimo), y <code>NORMAL</code> (&gt; stock_minimo).
+              Para validación de clientes: cliente activo puede comprar, cliente inactivo es rechazado automáticamente por regla de negocio.
+            </p>
+          </div>
+
+          <div class="test-suite-box">
+            <div class="test-suite-header">
+              <strong>3. Pruebas de Integración y Transacciones Atómicas (ACID)</strong>
+              <span class="test-tag">INTEGRACIÓN</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+              Verificación del ciclo transaccional <code>BEGIN &rarr; INSERT cabecera &rarr; INSERT detalle &rarr; UPDATE stock &rarr; COMMIT</code>.
+              Si ocurre una falla en cualquier ítem, se dispara <code>ROLLBACK</code> para evitar inconsistencia de datos en Supabase.
+              Al anular una venta (<code>/api/ventas/:id/anular</code>), se repone de forma íntegra el stock restado previamente.
+            </p>
+          </div>
+
+          <div style="margin-top: 24px; padding: 18px; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="font-size: 14px; margin-bottom: 8px;">Comandos para Ejecutar las Pruebas en Terminal:</h4>
+            <pre style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #38bdf8; background: #070a12; padding: 12px; border-radius: 6px; overflow-x: auto;">
+# Ejecutar todas las pruebas (Unitarias e Integración)
+npm test
+
+# Ejecutar únicamente pruebas unitarias con mocks rápidos
+npm run test:unit
+
+# Ejecutar pruebas de integración contra la API REST
+npm run test:integration
+
+# Generar reporte de cobertura de código
+npm run test:coverage</pre>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: NUEVO PRODUCTO -->
+  <div class="modal-backdrop" id="modal-producto">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="modal-producto-title">Registrar Nuevo Producto</h3>
+        <button class="modal-close" id="modal-producto-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-producto">
+          <div class="form-group">
+            <label class="form-label" for="prod-nombre">Nombre del Producto *</label>
+            <input type="text" id="prod-nombre" class="form-input" required placeholder="Ej: Teclado Mecánico RGB">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prod-descripcion">Descripción</label>
+            <input type="text" id="prod-descripcion" class="form-input" placeholder="Características técnicas">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="prod-precio">Precio Unitario ($) *</label>
+              <input type="number" id="prod-precio" class="form-input" step="0.01" min="0" required placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prod-stock">Stock Inicial *</label>
+              <input type="number" id="prod-stock" class="form-input" min="0" required value="10">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="prod-stock-minimo">Stock Mínimo (Alerta) *</label>
+              <input type="number" id="prod-stock-minimo" class="form-input" min="0" required value="3">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prod-categoria">Categoría *</label>
+              <select id="prod-categoria" class="form-input" required>
+                <!-- Opciones dinámicas -->
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prod-proveedor">Proveedor *</label>
+            <select id="prod-proveedor" class="form-input" required>
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-producto-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="modal-producto-save">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVO CLIENTE -->
+  <div class="modal-backdrop" id="modal-cliente">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Registrar Nuevo Cliente</h3>
+        <button class="modal-close" id="modal-cliente-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-cliente">
+          <div class="form-group">
+            <label class="form-label" for="cli-nombre">Nombre Completo *</label>
+            <input type="text" id="cli-nombre" class="form-input" required placeholder="Ej: Carlos Andrade">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cli-cedula">Cédula / Identificación *</label>
+            <input type="text" id="cli-cedula" class="form-input" required placeholder="Ej: 1710034065 o TEST-CLI-002">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="cli-telefono">Teléfono</label>
+              <input type="text" id="cli-telefono" class="form-input" placeholder="0991234567">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cli-correo">Correo Electrónico</label>
+              <input type="email" id="cli-correo" class="form-input" placeholder="cliente@example.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cli-direccion">Dirección</label>
+            <input type="text" id="cli-direccion" class="form-input" placeholder="Av. Principal y Secundaria">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cliente-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="modal-cliente-save">Guardar Cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLE DE VENTA -->
+  <div class="modal-backdrop" id="modal-detalle-venta">
+    <div class="modal-window" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="modal-detalle-title">Recibo de Venta</h3>
+        <button class="modal-close" id="modal-detalle-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-detalle-body">
+        <!-- Renderizado dinámico del recibo -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-detalle-btn-close">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container for Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
