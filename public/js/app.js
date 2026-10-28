@@ -477,7 +477,7 @@ async function procesarVenta() {
     document.getElementById('pos-stock-info').textContent = '';
 
     // Mostrar el recibo
-    verDetalleVenta(json.datos.id_venta);
+    window.verDetalleVenta(json.datos.id_venta);
 
     // Actualizar datos
     await Promise.all([loadDashboardData(), loadProductos()]);
