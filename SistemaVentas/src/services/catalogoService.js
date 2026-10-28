@@ -1,5 +1,5 @@
 const catalogoRepository = require('../repositories/catalogoRepository');
-const { validarTexto, validarEmail, validarEnteroPositivo } = require('../utils/validadores');
+const { validarTexto, validarEmail } = require('../utils/validadores');
 
 /**
  * Servicio para Categorías y Proveedores
