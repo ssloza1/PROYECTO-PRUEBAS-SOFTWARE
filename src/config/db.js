@@ -19,7 +19,7 @@ const poolConfig = connectionString
       port: Number(process.env.DB_PORT) || 5432,
       database: process.env.DB_NAME || 'postgres',
       user: process.env.DB_USER || 'postgres.kmahrxgfqplzggsjkwwo',
-      password: process.env.DB_PASSWORD || 'AsQiKk1mPGrao49f',
+      password: process.env.DB_PASSWORD || '',
       ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
       max: isTest ? 2 : 10,
       idleTimeoutMillis: 10000,

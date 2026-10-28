@@ -8,13 +8,11 @@ let supabase = null;
 
 if (supabaseUrl && supabaseKey) {
   supabase = createClient(supabaseUrl, supabaseKey);
-} else {
+} else if (process.env.NODE_ENV !== 'test') {
   // Nota informativa para el desarrollador si aún no configura la REST API Key
-  if (process.env.NODE_ENV !== 'test') {
     console.info(
       '[Supabase SDK] No se definió SUPABASE_SECRET_KEY en .env. Se usará la conexión directa PostgreSQL (db.js).'
     );
-  }
 }
 
 module.exports = supabase;

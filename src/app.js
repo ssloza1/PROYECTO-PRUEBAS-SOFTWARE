@@ -1,14 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const path = require('path');
+const path = require('node:path');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
+app.disable('x-powered-by');
 
 // Middlewares globales
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
