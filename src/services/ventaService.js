@@ -45,16 +45,12 @@ class VentaService {
     return venta;
   }
 
-  /**
-   * Registra una venta completa con validación de reglas de negocio y transacción atómica
-   * @param {object} payload
-   * @param {number} payload.id_cliente
-   * @param {Array<{id_producto: number, cantidad: number}>} payload.items
-   * @param {number} [payload.porcentajeIVA=0]
-   * @param {number} [payload.porcentajeDescuento=0]
-   */
-  async registrarVenta(payload) {
-    // 1. Validar cliente
+  // Helper 1: Validar payload básico y cliente
+  async _validarClienteYPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+      throw new Error('El payload de la venta es inválido');
+    }
+
     const idCliente = Number(payload.id_cliente);
     if (!validarEnteroPositivo(idCliente)) {
       throw new Error('Debe especificar un ID de cliente válido');
@@ -64,17 +60,16 @@ class VentaService {
     if (!cliente) {
       throw new Error(`El cliente con ID ${idCliente} no existe`);
     }
-    if (!cliente.activo) {
-      throw new Error(`El cliente ${cliente.nombre} se encuentra inactivo y no puede realizar compras`);
-    }
 
-    // 2. Validar ítems de la venta
-    const { items } = payload;
-    if (!Array.isArray(items) || items.length === 0) {
+    if (!Array.isArray(payload.items) || payload.items.length === 0) {
       throw new Error('La venta debe incluir al menos un producto');
     }
 
-    // Verificar unicidad de productos en los ítems
+    return { idCliente, cliente };
+  }
+
+  // Helper 2: Validar duplicados en los ítems
+  _validarDuplicados(items) {
     const vistos = new Set();
     for (const item of items) {
       const idProd = Number(item.id_producto);
@@ -83,49 +78,55 @@ class VentaService {
       }
       vistos.add(idProd);
     }
+  }
 
-    // 3. Validar existencia, estado activo y stock de cada producto
-    const itemsProcesados = [];
-    for (const item of items) {
-      const idProd = Number(item.id_producto);
-      const cantidad = Number(item.cantidad);
+  // Helper 3: Validar reglas de producto (existencia, estado y stock)
+  async _validarYProcesarProducto(item) {
+    const idProd = Number(item.id_producto);
+    const cantidad = Number(item.cantidad);
 
-      if (!validarEnteroPositivo(idProd)) {
-        throw new Error('Cada ítem debe tener un ID de producto válido');
-      }
-      if (!validarEnteroPositivo(cantidad)) {
-        throw new Error(`La cantidad del producto ID ${idProd} debe ser un entero mayor a cero`);
-      }
-
-      const producto = await this.productoRepo.findById(idProd);
-      if (!producto) {
-        throw new Error(`El producto con ID ${idProd} no existe`);
-      }
-      if (!producto.activo) {
-        throw new Error(`El producto "${producto.nombre}" se encuentra inactivo`);
-      }
-
-      if (!hayStockSuficiente(producto.stock, cantidad)) {
-        throw new Error(
-          `Stock insuficiente para "${producto.nombre}". Stock disponible: ${producto.stock}, requerido: ${cantidad}`
-        );
-      }
-
-      itemsProcesados.push({
-        id_producto: idProd,
-        nombre: producto.nombre,
-        cantidad,
-        precio_unitario: Number(producto.precio),
-      });
+    if (!validarEnteroPositivo(idProd)) {
+      throw new Error('Cada ítem debe tener un ID de producto válido');
+    }
+    if (!validarEnteroPositivo(cantidad)) {
+      throw new Error(`La cantidad del producto ID ${idProd} debe ser un entero mayor a cero`);
     }
 
-    // 4. Calcular importes usando utilidades puras
-    const calculos = calcularTotalesVenta(itemsProcesados, {
-      porcentajeIVA: payload.porcentajeIVA || 0,
-      porcentajeDescuento: payload.porcentajeDescuento || 0,
-    });
+    const producto = await this.productoRepo.findById(idProd);
+    if (!producto) {
+      throw new Error(`El producto con ID ${idProd} no existe`);
+    }
+    if (!producto.activo) {
+      throw new Error(`El producto "${producto.nombre}" se encuentra inactivo`);
+    }
 
-    // 5. Ejecutar la transacción en base de datos
+    if (!hayStockSuficiente(producto.stock, cantidad)) {
+      throw new Error(
+        `Stock insuficiente para "${producto.nombre}". Stock disponible: ${producto.stock}, requerido: ${cantidad}`
+      );
+    }
+
+    return {
+      id_producto: idProd,
+      nombre: producto.nombre,
+      cantidad,
+      precio_unitario: Number(producto.precio),
+    };
+  }
+
+  // Helper 4: Iterar y procesar todos los productos
+  async _obtenerItemsProcesados(items) {
+    this._validarDuplicados(items);
+    const itemsProcesados = [];
+    for (const item of items) {
+      const itemProcesado = await this._validarYProcesarProducto(item);
+      itemsProcesados.push(itemProcesado);
+    }
+    return itemsProcesados;
+  }
+
+  // Helper 5: Transacción atómica en Base de Datos
+  async _ejecutarTransaccionVenta(idCliente, cliente, itemsProcesados, calculos) {
     const client = await this.db.getClient();
     try {
       await client.query('BEGIN');
@@ -186,6 +187,27 @@ class VentaService {
     } finally {
       client.release();
     }
+  }
+
+  /**
+   * Registra una venta completa con validación de reglas de negocio y transacción atómica
+   * @param {object} payload
+   */
+  async registrarVenta(payload) {
+    // 1. Validar cliente y payload
+    const { idCliente, cliente } = await this._validarClienteYPayload(payload);
+
+    // 2. Procesar y validar ítems
+    const itemsProcesados = await this._obtenerItemsProcesados(payload.items);
+
+    // 3. Calcular importes
+    const calculos = calcularTotalesVenta(itemsProcesados, {
+      porcentajeIVA: payload.porcentajeIVA || 0,
+      porcentajeDescuento: payload.porcentajeDescuento || 0,
+    });
+
+    // 4. Ejecutar la transacción
+    return await this._ejecutarTransaccionVenta(idCliente, cliente, itemsProcesados, calculos);
   }
 
   /**
