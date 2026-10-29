@@ -11,7 +11,7 @@
  * @returns {number}
  */
 function redondear(valor, decimales = 2) {
-  if (typeof valor !== 'number' || isNaN(valor)) {
+  if (typeof valor !== 'number' || Number.isNaN(valor)) {
     throw new TypeError('El valor a redondear debe ser un número válido');
   }
   const factor = Math.pow(10, decimales);
@@ -28,7 +28,7 @@ function calcularSubtotal(cantidad, precioUnitario) {
   if (typeof cantidad !== 'number' || !Number.isInteger(cantidad) || cantidad <= 0) {
     throw new Error('La cantidad debe ser un número entero mayor a cero');
   }
-  if (typeof precioUnitario !== 'number' || isNaN(precioUnitario) || precioUnitario < 0) {
+  if (typeof precioUnitario !== 'number' || Number.isNaN(precioUnitario) || precioUnitario < 0) {
     throw new Error('El precio unitario debe ser un número mayor o igual a cero');
   }
   return redondear(cantidad * precioUnitario, 2);
@@ -117,10 +117,10 @@ function calcularTotalesVenta(items, opciones = {}) {
  * @returns {'AGOTADO'|'CRITICO'|'NORMAL'}
  */
 function evaluarNivelStock(stock, stockMinimo = 0) {
-  if (typeof stock !== 'number' || isNaN(stock)) {
-    throw new Error('El stock debe ser un valor numérico');
+  if (typeof stock !== 'number' || Number.isNaN(stock)) {
+    throw new TypeError('El stock debe ser un valor numérico');
   }
-  if (typeof stockMinimo !== 'number' || isNaN(stockMinimo) || stockMinimo < 0) {
+  if (typeof stockMinimo !== 'number' || Number.isNaN(stockMinimo) || stockMinimo < 0) {
     throw new Error('El stock mínimo debe ser un número mayor o igual a cero');
   }
 
@@ -146,7 +146,7 @@ function evaluarNivelStock(stock, stockMinimo = 0) {
  */
 function hayStockSuficiente(stockActual, cantidadRequerida) {
   if (typeof stockActual !== 'number' || typeof cantidadRequerida !== 'number') {
-    throw new Error('Tanto el stock como la cantidad requerida deben ser números');
+    throw new TypeError('Tanto el stock como la cantidad requerida deben ser números');
   }
   if (cantidadRequerida <= 0) {
     throw new Error('La cantidad requerida debe ser mayor a cero');

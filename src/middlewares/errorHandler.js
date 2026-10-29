@@ -2,7 +2,7 @@
  * Middleware centralizado de manejo de errores
  * Mapea errores de validación de negocio a código HTTP 400
  */
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res, _next) {
   const mensaje = (err.message || '').toLowerCase();
 
   const esErrorValidacion =

@@ -1,7 +1,6 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-const isProduction = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
 
 // Conexión preferente mediante DATABASE_URL o variables individuales
@@ -20,7 +19,7 @@ const poolConfig = connectionString
       port: Number(process.env.DB_PORT) || 5432,
       database: process.env.DB_NAME || 'postgres',
       user: process.env.DB_USER || 'postgres.kmahrxgfqplzggsjkwwo',
-      password: process.env.DB_PASSWORD || 'AsQiKk1mPGrao49f',
+      password: process.env.DB_PASSWORD || '',
       ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false },
       max: isTest ? 2 : 10,
       idleTimeoutMillis: 10000,
