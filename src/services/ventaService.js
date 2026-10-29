@@ -119,7 +119,7 @@ class VentaService {
     this._validarDuplicados(items);
     const itemsProcesados = [];
     for (const item of items) {
-      const itemProcesado = await this._validarYProcesarProducto(item);
+      const itemProcesado = await this._validarYProcesarProducto(item); // NOSONAR: validación secuencial intencional
       itemsProcesados.push(itemProcesado);
     }
     return itemsProcesados;
@@ -144,7 +144,7 @@ class VentaService {
       // Insertar detalles y descontar stock
       const detallesCreados = [];
       for (const item of itemsProcesados) {
-        const detalle = await this.ventaRepo.createDetail(
+        const detalle = await this.ventaRepo.createDetail( // NOSONAR: operación secuencial dentro de la transacción
           {
             id_venta: cabecera.id_venta,
             id_producto: item.id_producto,
@@ -159,7 +159,7 @@ class VentaService {
         });
 
         // Descontar inventario (delta negativo)
-        const prodActualizado = await this.productoRepo.updateStock(
+        const prodActualizado = await this.productoRepo.updateStock( // NOSONAR: operación secuencial dentro de la transacción
           item.id_producto,
           -item.cantidad,
           client
@@ -239,7 +239,7 @@ class VentaService {
       // Reponer stock para cada detalle
       const detalles = await this.ventaRepo.findDetailsByVentaId(idNum, client);
       for (const d of detalles) {
-        await this.productoRepo.updateStock(d.id_producto, d.cantidad, client);
+        await this.productoRepo.updateStock(d.id_producto, d.cantidad, client); // NOSONAR: reposición secuencial dentro de la transacción
       }
 
       await client.query('COMMIT');

@@ -167,8 +167,8 @@
         <div class="content-card">
           <div class="content-card-header">
             <div class="filters-bar">
-              <input type="text" id="filtro-buscar-producto" class="search-input" placeholder="Buscar por nombre o descripción...">
-              <select id="filtro-categoria" class="select-input">
+              <input type="text" id="filtro-buscar-producto" class="search-input" placeholder="Buscar por nombre o descripción..." aria-label="Buscar producto por nombre o descripción">
+              <select id="filtro-categoria" class="select-input" aria-label="Filtrar por categoría">
                 <option value="">Todas las categorías</option>
               </select>
               <label style="font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-muted);">
@@ -265,7 +265,7 @@
               </div>
               <div class="summary-row">
                 <span>Descuento (%)</span>
-                <input type="number" id="pos-descuento-pct" min="0" max="100" value="0" style="width: 65px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; padding: 2px 6px; border-radius: 4px; text-align: right;">
+                <input type="number" id="pos-descuento-pct" min="0" max="100" value="0" aria-label="Descuento en porcentaje" style="width: 65px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; padding: 2px 6px; border-radius: 4px; text-align: right;">
               </div>
               <div class="summary-row">
                 <span>IVA (15%)</span>
@@ -294,7 +294,7 @@
             <p>Registro histórico, consulta de recibos y anulación con reposición de inventario</p>
           </div>
           <div class="header-actions">
-            <select id="filtro-ventas-estado" class="select-input">
+            <select id="filtro-ventas-estado" class="select-input" aria-label="Filtrar por estado de venta">
               <option value="">Todos los estados</option>
               <option value="COMPLETADA">Completadas</option>
               <option value="ANULADA">Anuladas</option>

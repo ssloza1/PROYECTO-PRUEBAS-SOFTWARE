@@ -139,8 +139,9 @@ body {
 }
 
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(6, 182, 212, 0.08));
-  color: #60a5fa;
+  background-color: #16233f;
+  background-image: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(6, 182, 212, 0.08));
+  color: #93c5fd;
   border-left: 3px solid var(--primary);
   font-weight: 600;
 }
@@ -254,9 +255,9 @@ body {
 }
 
 .btn-danger {
-  background: rgba(239, 68, 68, 0.15);
+  background-color: #3b1414;
   border-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  color: #fca5a5;
 }
 
 .btn-danger:hover {
@@ -336,10 +337,10 @@ body {
   font-size: 18px;
 }
 
-.metric-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.metric-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.metric-icon.amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.metric-icon.cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+.metric-icon.blue { background-color: #172554; color: #93c5fd; }
+.metric-icon.green { background-color: #052e2b; color: #6ee7b7; }
+.metric-icon.amber { background-color: #3b2606; color: #fcd34d; }
+.metric-icon.cyan { background-color: #083344; color: #67e8f9; }
 
 .metric-value {
   font-size: 28px;
@@ -467,10 +468,10 @@ body {
   letter-spacing: 0.02em;
 }
 
-.badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-.badge-neutral { background: rgba(148, 163, 184, 0.12); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.2); }
+.badge-success { background-color: #052e2b; color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-warning { background-color: #3b2606; color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-danger { background-color: #3b1414; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-neutral { background-color: #1e293b; color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.2); }
 
 /* POS Split Layout */
 .pos-layout {
@@ -743,6 +744,14 @@ body {
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 4px;
-  background: rgba(59, 130, 246, 0.15);
-  color: #93c5fd;
+  background-color: #172554;
+  color: #bfdbfe;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot,
+  .modal-window,
+  .toast {
+    animation: none;
+  }
 }

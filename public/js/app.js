@@ -31,7 +31,8 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   
-  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  const icons = { success: '✅', error: '❌' };
+  const icon = icons[type] || 'ℹ️';
   toast.innerHTML = `<span>${icon}</span> <div>${message}</div>`;
   
   container.appendChild(toast);
@@ -49,7 +50,7 @@ function setupNavigation() {
 
   navItems.forEach((item) => {
     item.addEventListener('click', () => {
-      const targetId = item.getAttribute('data-tab');
+      const targetId = item.dataset.tab;
 
       navItems.forEach((n) => n.classList.remove('active'));
       item.classList.add('active');
@@ -59,11 +60,11 @@ function setupNavigation() {
       });
 
       // Recargas específicas al entrar en pestaña
-      if (targetId === 'tab-dashboard') loadDashboardData();
-      if (targetId === 'tab-inventario') loadProductos();
-      if (targetId === 'tab-pos') preparePOS();
-      if (targetId === 'tab-ventas') loadVentas();
-      if (targetId === 'tab-clientes') loadClientes();
+      if (targetId === 'tab-dashboard') void loadDashboardData();
+      if (targetId === 'tab-inventario') void loadProductos();
+      if (targetId === 'tab-pos') void preparePOS();
+      if (targetId === 'tab-ventas') void loadVentas();
+      if (targetId === 'tab-clientes') void loadClientes();
     });
   });
 
@@ -295,7 +296,7 @@ function setupPOS() {
 
   selProd?.addEventListener('change', () => {
     const opt = selProd.selectedOptions[0];
-    if (opt && opt.value) {
+    if (opt?.value) {
       const stock = Number(opt.dataset.stock);
       const precio = Number(opt.dataset.precio);
       infoStock.textContent = `Disponible: ${stock} unidades | Precio: ${formatCurrency(precio)}`;
@@ -672,8 +673,8 @@ function setupModals() {
 
       showToast('¡Producto registrado con éxito!', 'success');
       modalProd.classList.remove('show');
-      loadProductos();
-      loadDashboardData();
+      await loadProductos();
+      await loadDashboardData();
     } catch (err) {
       showToast(`Error al guardar producto: ${err.message}`, 'error');
     }
@@ -706,7 +707,7 @@ function setupModals() {
 
       showToast('¡Cliente registrado con éxito!', 'success');
       modalCli.classList.remove('show');
-      loadClientes();
+      await loadClientes();
     } catch (err) {
       showToast(`Error al guardar cliente: ${err.message}`, 'error');
     }
