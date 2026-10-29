@@ -2,22 +2,73 @@
   "name": "proyecto-pruebas-software-root",
   "version": "1.0.0",
   "description": "Sistema de Inventario y Ventas - Pruebas de Software",
+  "main": "src/server.js",
   "scripts": {
-    "start": "npm --prefix SistemaVentas start",
-    "dev": "npm --prefix SistemaVentas run dev",
-    "test": "npm --prefix SistemaVentas test",
-    "test:unit": "npm --prefix SistemaVentas run test:unit",
-    "test:integration": "npm --prefix SistemaVentas run test:integration",
-    "test:coverage": "npm --prefix SistemaVentas run test:coverage"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "jest --runInBand --testPathIgnorePatterns tests/integration",
+    "test:unit": "jest tests/unit --runInBand",
+    "test:api": "jest tests/api --runInBand",
+    "test:integration": "jest tests/integration --runInBand --detectOpenHandles",
+    "test:coverage": "jest tests/unit --coverage --runInBand",
+    "test:vv": "npm run lint && npm run test:coverage",
+    "test:watch": "jest --watch"
   },
-  "keywords": [],
+  "keywords": [
+    "pruebas-de-software",
+    "software-testing",
+    "unit-testing",
+    "integration-testing",
+    "jest",
+    "supertest",
+    "inventario",
+    "ventas",
+    "supabase",
+    "postgresql"
+  ],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "dotenv": "^18.0.9",
-    "supertest": "^7.3.1"
-  },
   "dependencies": {
-    "pg": "^8.23.1"
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/database/",
+      "/public/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/config/db.js",
+      "!src/controllers/catalogoController.js"
+    ],
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "lcov",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 70,
+        "lines": 70
+      }
+    }
   }
 }

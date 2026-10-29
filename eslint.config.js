@@ -17,7 +17,7 @@ const reglasLab = {
 module.exports = [
   {
     // Carpetas que ESLint no debe revisar
-    ignores: ['node_modules/**', 'coverage/**'],
+    ignores: ['**/node_modules/**', '**/coverage/**'],
   },
   {
     // Código de la API (Node.js)
